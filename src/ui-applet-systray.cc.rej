@@ -1,0 +1,42 @@
+--- ui-applet-systray.cc	2009-01-02 08:45:39.000000000 +0800
++++ ui-applet-systray.cc	2010-10-03 01:46:57.000000000 +0800
+@@ -46,27 +45,21 @@
+ AppletSystray::AppletSystray (Biff *biff) : AppletGtk (biff, this)
+ {
+ 	// Create the system tray icon
+-	trayicon_ = egg_tray_icon_new ("trayicon");
+-
++  trayicon_ = gtk_status_icon_new();
++ 	str_trayicon_image_="";
++	str_trayicon_text_="";
++	pixbuf_trayicon_image_=NULL;
++	is_show_text_=false;
++	widget_max_width_=0;
++	widget_max_height_=0;
+ 	// Connect signals to system tray icon
+-	g_signal_connect (G_OBJECT (trayicon_), "size-allocate",
+-					  GTK_SIGNAL_FUNC (signal_size_allocate), this);
+-
+-	// Tooltips shall be displayed in the system tray
+-	GtkTooltips *applet_tips = gtk_tooltips_new ();
+-	gtk_tooltips_set_tip (applet_tips, GTK_WIDGET (trayicon_), "", "");
+-	tooltip_widget_ = GTK_WIDGET (trayicon_);
+-
+-	// We don't want a visible frame in the system tray
+-	gtk_frame_set_shadow_type (GTK_FRAME (get ("frame")), GTK_SHADOW_NONE);
+-
+-	// We want to reuse the widgets for AppletGtk. So we have to change the
+-	// parent from the top level window to the system tray icon
+-	GtkWidget *eventbox = GTK_WIDGET (get ("event"));
+-	gtk_widget_reparent (eventbox, GTK_WIDGET (trayicon_));
++  g_signal_connect(G_OBJECT(trayicon_), "button-press-event",
++       G_CALLBACK(on_trayicon_btn_press), this);
++  g_signal_connect (trayicon_, "notify::size",
++                      G_CALLBACK (signal_size_allocate), this);
+ 
+ 	// Show the tray icon
+-	gtk_widget_show_all (GTK_WIDGET (trayicon_));
++	gtk_status_icon_set_visible(trayicon_, TRUE);
+ }
+ 
+ /// Destructor.

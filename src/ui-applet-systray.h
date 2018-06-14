@@ -32,14 +32,22 @@
 
 #include <gtk/gtk.h>
 
-#include "eggtrayicon.h"
 #include "ui-applet-gtk.h"
 
 
 class AppletSystray : public AppletGtk {
  private:
 	/// Icon in the system tray
-	EggTrayIcon *trayicon_;
+	GtkStatusIcon *trayicon_;
+	std::string str_trayicon_image_;
+	std::string str_trayicon_text_;
+	GdkPixbuf * pixbuf_trayicon_image_;
+	gboolean is_show_text_;
+
+	GdkPixbuf * load_image_and_add_text( const gchar *filename,
+                        	const gchar *markup ,
+													guint maxw,
+													guint maxh );
 
  public:
 	// ========================================================================
@@ -56,15 +64,28 @@ class AppletSystray : public AppletGtk {
 	// ========================================================================
 	//  main
 	// ========================================================================
+  gboolean update (gboolean init = false);
+  gboolean update (gboolean init,
+               std::string widget_image = "",
+               std::string widget_text = "",
+               std::string widget_container = "");
+//	gboolean update (gboolean init = false);
 	void show (std::string name = "dialog");
-	void resize (guint width, guint height);
+	void resize (void);//(guint width, guint height);
 
 	// ========================================================================
 	//  callbacks
 	// ========================================================================
-	static void signal_size_allocate (GtkWidget *widget,
+/*	static void signal_size_allocate (GtkWidget *widget,
 									  GtkAllocation *allocation,
-									  gpointer data);
+									  gpointer data);*/
+	static void signal_size_allocate (GObject *gobject, 
+                    GParamSpec *arg1, 
+                    gpointer data);
+	static gboolean on_trayicon_btn_press(GtkStatusIcon  *, 
+										GdkEventButton *, 
+										gpointer );
+	void tooltip_update (void);
 };
 
 #endif
